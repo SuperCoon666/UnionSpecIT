@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axios from '../axios-config';
 
 export default {
     name: "UserPageView",
@@ -39,7 +39,7 @@ export default {
         async fetchUserData() {
             const userId = this.$store.getters.getUserId;
             try {
-                const response = await axios.get(`http://localhost:8081/get-user/${userId}`);
+                const response = await axios.get(`/get-user/${userId}`);
                 this.UserName = response.data.nickname;
             } catch (error) {
                 console.error("There was an error fetching the user data:", error);

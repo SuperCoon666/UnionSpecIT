@@ -10,7 +10,8 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axios from '../axios-config';
+
 export default {
     name: "PostCreationView",
     data() {
@@ -28,7 +29,7 @@ export default {
         submitPost() {
             // Проверяем, что мы редактируем существующий пост
             if (this.idUserCreated !== null && this.idPost !== null) {
-                axios.put(`http://localhost:8081/edit-post/${this.idPost}`, {
+                axios.put(`/edit-post/${this.idPost}`, {
                     id: this.idPost,
                     headline: this.headline,
                     content: this.content,
@@ -47,7 +48,7 @@ export default {
                 });
             } else if (this.idPost === null && this.$store.getters.getUserId !== null) {
                 // Создаем новый пост
-                axios.post('http://localhost:8081/create-post', {
+                axios.post('/create-post', {
                     headline: this.headline,
                     content: this.content,
                     idUserCreated: this.$store.getters.getUserId, // Обращаемся к геттеру как к свойству
@@ -69,7 +70,7 @@ export default {
         },
         deletePost() {
             if (this.idPost !== null) {
-                axios.delete(`http://localhost:8081/delete-post/${this.idPost}`)
+                axios.delete(`/delete-post/${this.idPost}`)
                 .then(response => {
                     console.log('Post deleted:', response.data);
                     this.$router.push({

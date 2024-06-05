@@ -3,8 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "node --openssl-legacy-provider node_modules/@vue/cli-service/bin/vue-cli-service.js serve",
-    "build": "vue-cli-service build"
+    "serve": "powershell -ExecutionPolicy ByPass -File serve.ps1",
+    "build": "powershell -ExecutionPolicy ByPass -File build.ps1",
+    "serve-only": "vue-cli-service serve",
+    "build-only": "vue-cli-service build",
+    "copy": "copyfiles -u 1 dist/**/* ../back4spec-master/src/main/resources/static/"
   },
   "dependencies": {
     "axios": "^1.6.2",
@@ -22,6 +25,7 @@
     "@vue/cli-plugin-router": "~4.5.15",
     "@vue/cli-plugin-vuex": "~4.5.15",
     "@vue/cli-service": "~4.5.15",
+    "copyfiles": "^2.4.1",
     "sass-loader": "^8.0.2",
     "vue-cli-plugin-element": "^1.0.1",
     "vue-template-compiler": "^2.6.11"

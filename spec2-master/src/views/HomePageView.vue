@@ -1,99 +1,87 @@
 <template>
-  <div>
-      <div class="but-header" >
-          <el-button class="place-but but-rec">Recommendations</el-button>
+    <div>
+        <div class="but-header">
+            <el-button class="place-but but-rec">Recommendations</el-button>
             <el-select v-model="FilterValue" placeholder="Filter" class="place-but but-filter">
                 <el-option
-                  v-for="item in options"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value">
+                    v-for="item in options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
                 </el-option>
             </el-select>
-      </div>
-      <div class="content-holder">
-          <article v-for="post in posts" class="Headline" @click="openPost(post)">
-              {{post.headline}}
-          </article>
-      </div>
-      <el-pagination
-              @current-change="handlePageChange"
-              :current-page="currentPage"
-              :page-size="pageSize"
-              layout="prev, pager, next"
-              :total="23"
-              class="pagination"
-      ></el-pagination>
-  </div>
+        </div>
+        <div class="content-holder">
+            <article v-for="post in filteredPosts" :key="post.id" class="Headline" @click="openPost(post)">
+                {{ post.headline }}
+            </article>
+        </div>
+        <el-pagination
+            @current-change="handlePageChange"
+            :current-page="currentPage"
+            :page-size="pageSize"
+            layout="prev, pager, next"
+            :total="totalItems"
+            :page-count="totalPages"
+            class="pagination"
+        ></el-pagination>
+    </div>
 </template>
 
 <script>
-import axios from 'axios';
+import axios from '../axios-config';
 
 export default {
     name: "HomeView",
-    components: {
-    // HelloWorld,
+    data() {
+        return {
+            posts: [],
+            options: [
+                { value: 'headline', label: 'Headline' },
+                { value: 'id', label: 'ID' },
+                { value: 'idUserCreated', label: 'User ID' }
+            ],
+            FilterValue: '',
+            currentPage: 1,
+            pageSize: 7,
+            totalItems: 0,
+            totalPages: 0,
+        };
     },
-    data(){
-        return{
-              posts: [
-                  // {'template':"What is a relational database?", 'url':'/content'},
-                  // {'template':"Introduction to Relational Databases", 'url':'/content'},
-                  // {'template':"Relational Database Design Basics", 'url':'/content'},
-                  // {'template':"Understanding SQL and Relational Databases", 'url':'/content'},
-                  // {'template':"The Advantages of Relational Databases", 'url':'/content'},
-                  // {'template':"Common Challenges in Managing Relational Databases", 'url':'/content'},
-                  // {'template':"Optimizing Performance in Relational Databases", 'url':'/content'},
-                  // {'template':"Migrating to a Relational Database: Best Practices", 'url':'/content'},
-                  // {'template':"Security Considerations for Relational Databases", 'url':'/content'},
-                  // {'template':"Relational Databases vs. Non-Relational Databases: Pros and Cons", 'url':'/content'},
-                  // {'template':"Graph Databases: An Alternative to Relational Databases", 'url':'/content'},
-                  // {'template':"Real-World Examples of Relational Databases", 'url':'/content'},
-                  // {'template':"Scaling Relational Databases for Large Enterprises", 'url':'/content'},
-                  // {"template": "Relational Databases in the Cloud: Best Practices", "url": "/content"},
-                  // {"template": "Relational Databases for Web Applications", "url": "/content"},
-                  // {"template": "Choosing the Right Relational Database Management System", "url": "/content"},
-                  // {"template": "Data Modeling for Relational Databases", "url": "/content"},
-                  // {"template": "Data Integrity in Relational Databases", "url": "/content"},
-                  // {"template": "Relational Databases and Business Intelligence", "url": "/content"},
-                  // {"template": "Relational Databases in the Age of Big Data", "url": "/content"},
-                  // {"template": "The Future of Relational Databases", "url": "/content"},
-                  // {"template": "Common Myths About Relational Databases", "url": "/content"},
-              ],
-              options: [{
-                          value: 'Topics',
-                          label: 'Topics'
-                          }, {
-                          value: 'Date',
-                          label: 'Date'
-                          }, {
-                          value: 'Rating',
-                          label: 'Rating'
-                          }, {
-                          value: 'Author',
-                          label: 'Author'
-                          }, {
-                          value: 'Type',
-                          label: 'Type'
-                      }],
-              FilterValue: '',
-              currentPage: 1,
-              pageSize: 7,
+    computed: {
+        filteredPosts() {
+            if (!this.FilterValue) {
+                return this.posts;
             }
+
+            switch (this.FilterValue) {
+                case 'headline':
+                    return this.posts.sort((a, b) => a.headline.localeCompare(b.headline));
+                case 'id':
+                    return this.posts.sort((a, b) => a.id - b.id);
+                case 'idUserCreated':
+                    return this.posts.sort((a, b) => a.idUserCreated - b.idUserCreated);
+                default:
+                    return this.posts;
+            }
+        }
     },
-    methods:{
+    methods: {
         getPostsRecommendations() {
-            // console.log(this.$store.getters.getUserId);
-            // console.log(this.$store.getters.getNickname);
-            axios.get('http://localhost:8081/get-posts-recommendations', {
+            axios.get('/get-posts-recommendations', {
                 params: {
                     page: this.currentPage,
-                    size: this.pageSize
+                    size: this.pageSize,
+                    filter: this.FilterValue
                 }
             })
             .then(response => {
-                this.posts = response.data;
+                this.posts = response.data.posts;
+                this.currentPage = response.data.currentPage;
+                this.totalItems = response.data.totalItems;
+                this.totalPages = response.data.totalPages;
+                console.log("TOTAL_P: ", response.data.totalPages)
+                console.log("TOTAL_I: ", response.data.totalItems)
             })
             .catch(error => {
                 console.error("There was an error!", error);
@@ -102,7 +90,6 @@ export default {
         handlePageChange(newPage) {
             this.currentPage = newPage;
             this.getPostsRecommendations();
-            console.log(this.currentPage)
         },
         openPost(post) {
             this.$router.push({
@@ -116,17 +103,6 @@ export default {
             });
         }
     },
-    computed: {
-      currentTheme() {
-        return this.$store.getters.currentTheme;
-      },
-      myElementStyle() {
-        return {
-          backgroundColor: this.currentTheme.backgroundColor,
-          color: this.currentTheme.textColor,
-        };
-      },
-    },
     mounted() {
         this.getPostsRecommendations();
     },
@@ -135,9 +111,14 @@ export default {
             if (newPage !== oldPage) {
                 this.getPostsRecommendations();
             }
+        },
+        FilterValue(newValue, oldValue) {
+            if (newValue !== oldValue) {
+                this.getPostsRecommendations();
+                console.log("FILTERED")
+            }
         }
     }
-
 };
 </script>
 

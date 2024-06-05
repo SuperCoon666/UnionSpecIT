@@ -26,7 +26,8 @@
 
 <script>
 import { validateEmail } from '@/utils/validate'
-import axios from 'axios';
+import axios from '../axios-config';
+
     export default {
     name: 'Login',
     data() {
@@ -75,7 +76,7 @@ import axios from 'axios';
             this.$refs.loginForm.validate(valid => {
                 if (valid) {
                     this.loading = true;
-                    axios.post('http://localhost:8081/login', {
+                    axios.post('/login', {
                         nickname: this.loginForm.phone, // Используем phone как nickname
                         pswrd: this.loginForm.pass
                     })
@@ -107,7 +108,7 @@ import axios from 'axios';
             this.$refs.loginForm.validate(valid => {
                 if (valid) {
                     this.loading = true;
-                    axios.post('http://localhost:8081/register', { // Обратите внимание на измененный URL
+                    axios.post('/register', { // Обратите внимание на измененный URL
                         nickname: this.loginForm.phone, // Используем phone как nickname
                         pswrd: this.loginForm.pass
                     })
