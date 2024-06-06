@@ -37,9 +37,9 @@ export default {
         return {
             posts: [],
             options: [
-                { value: 'headline', label: 'Headline' },
-                { value: 'id', label: 'ID' },
-                { value: 'idUserCreated', label: 'User ID' }
+                { value: 'headline', label: 'Title' },
+                { value: 'id', label: 'Date' },
+                { value: 'idUserCreated', label: 'Author' }
             ],
             FilterValue: '',
             currentPage: 1,
